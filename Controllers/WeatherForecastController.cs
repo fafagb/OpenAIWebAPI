@@ -137,13 +137,13 @@ public class OpenAIController : ControllerBase
 
     },
                 Model = Models.ChatGpt3_5Turbo,
-                MaxTokens = 2024//optional
+                MaxTokens = 150//optional
             });
             if (completionResult.Successful)
             {
                 return completionResult.Choices.First().Message.Content;
             }
-            return "失败";
+            return "失败"+completionResult.Error.Message;
         }
         catch (System.Exception ex)
         {
