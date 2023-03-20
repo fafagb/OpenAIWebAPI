@@ -143,7 +143,7 @@ public class OpenAIController : ControllerBase
             {
                 return completionResult.Choices.First().Message.Content;
             }
-            return "";
+            return "失败";
         }
         catch (System.Exception ex)
         {
