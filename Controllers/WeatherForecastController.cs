@@ -47,7 +47,7 @@ public class OpenAIController : ControllerBase
 
 
     [HttpGet]
-    public async Task<string> Call(string prompt)
+    public async Task<string> Call2(string prompt)
     {
         string apiKey = "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";
         using (var httpClient = new HttpClient())
@@ -121,7 +121,7 @@ public class OpenAIController : ControllerBase
 
     //写一个异步方法
     [HttpGet]
-    public async Task<string> Call2(string str)
+    public async Task<string> Call(string str)
     {
         try
         {
@@ -149,7 +149,7 @@ public class OpenAIController : ControllerBase
         {
             // TODO
 
-            return "";
+            return "错误："+ex.Message;
         }
 
     }
