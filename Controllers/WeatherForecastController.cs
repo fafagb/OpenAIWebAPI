@@ -88,7 +88,7 @@ public class OpenAIController : ControllerBase
     public async Task<string> Get(string str)
     {
         string model = "davinci";
-        string apiKey = "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";
+        string apiKey = "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";
         string apiUrl = "https://api.openai.com/v1/engines/" + model + "/completions";
 
         var request = new
@@ -128,7 +128,7 @@ public class OpenAIController : ControllerBase
             var openAiService = new OpenAIService(new OpenAiOptions()
             {
                // ApiKey = "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"
-                ApiKey = "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"
+                ApiKey = "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"
             });
             var completionResult = await openAiService.ChatCompletion.CreateCompletion(new ChatCompletionCreateRequest
             {
