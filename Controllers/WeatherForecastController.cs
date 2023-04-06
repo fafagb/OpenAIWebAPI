@@ -88,7 +88,7 @@ public class OpenAIController : ControllerBase
     public async Task<string> Get(string str)
     {
         string model = "davinci";
-        string apiKey = "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";
+        string apiKey = "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";
         string apiUrl = "https://api.openai.com/v1/engines/" + model + "/completions";
 
         var request = new
