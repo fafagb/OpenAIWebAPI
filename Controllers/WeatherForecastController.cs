@@ -109,7 +109,7 @@ public class OpenAIController : ControllerBase {
         string expectedReferer = "https://ai.myi.cn";
 
         // 检查请求的 Referer 字段
-        string referer = Request.Headers["Referer"].ToString ();
+        string referer = Request.Headers["Origin"].ToString ();
 
         if (referer != expectedReferer) {
 
