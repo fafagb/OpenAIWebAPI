@@ -113,7 +113,7 @@ public class OpenAIController : ControllerBase {
 
         if (referer != expectedReferer) {
 
-            return "Access denied";
+            return $"Access denied:{referer}";
         }
         try {
             var openAiService = new OpenAIService (new OpenAiOptions () {
