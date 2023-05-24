@@ -10,54 +10,47 @@ using OpenAI.GPT3.ObjectModels.RequestModels;
 
 namespace OpenAIWebAPI.Controllers;
 
-class OpenAIResponse
-{
+class OpenAIResponse {
     public OpenAIChoice[] Choices { get; set; }
 }
 
-class OpenAIChoice
-{
+class OpenAIChoice {
     public string Text { get; set; }
     public double? Logprobs { get; set; }
     public string[] Tokens { get; set; }
 }
 
-
-
-
-
 [ApiController]
-[Route("[controller]/[action]")]
-public class OpenAIController : ControllerBase
-{
-    private static readonly string[] Summaries = new[]
-    {
-        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
+[Route ("[controller]/[action]")]
+public class OpenAIController : ControllerBase {
+    private static readonly string[] Summaries = new [] {
+        "Freezing",
+        "Bracing",
+        "Chilly",
+        "Cool",
+        "Mild",
+        "Warm",
+        "Balmy",
+        "Hot",
+        "Sweltering",
+        "Scorching"
     };
 
     private readonly ILogger<OpenAIController> _logger;
 
-    public OpenAIController(ILogger<OpenAIController> logger)
-    {
+    public OpenAIController (ILogger<OpenAIController> logger) {
         _logger = logger;
     }
 
-
-
-
-
     [HttpGet]
-    public async Task<string> Call2(string prompt)
-    {
+    public async Task<string> Call2 (string prompt) {
         string apiKey = "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";
-        using (var httpClient = new HttpClient())
-        {
+        using (var httpClient = new HttpClient ()) {
             httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", apiKey);
+                new AuthenticationHeaderValue ("Bearer", apiKey);
 
             var apiUrl = "https://api.openai.com/v1/engines/davinci-codex/completions";
-            var requestData = new
-            {
+            var requestData = new {
                 prompt = prompt,
                 max_tokens = 50,
                 n = 1,
@@ -65,34 +58,29 @@ public class OpenAIController : ControllerBase
                 temperature = 1.0
             };
 
-            var content = new StringContent(JsonConvert.SerializeObject(requestData), Encoding.UTF8, "application/json");
-            content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-            var response = await httpClient.PostAsync(apiUrl, content);
+            var content = new StringContent (JsonConvert.SerializeObject (requestData), Encoding.UTF8, "application/json");
+            content.Headers.ContentType = new MediaTypeHeaderValue ("application/json");
+            var response = await httpClient.PostAsync (apiUrl, content);
 
-            if (response.IsSuccessStatusCode)
-            {
-                var jsonResponse = await response.Content.ReadAsStringAsync();
-                dynamic resultObject = JsonConvert.DeserializeObject(jsonResponse);
-                string result = resultObject.choices[0].text.ToString();
+            if (response.IsSuccessStatusCode) {
+                var jsonResponse = await response.Content.ReadAsStringAsync ();
+                dynamic resultObject = JsonConvert.DeserializeObject (jsonResponse);
+                string result = resultObject.choices[0].text.ToString ();
                 return result;
-            }
-            else
-            {
-                throw new Exception("Error calling OpenAI API: " + response.StatusCode);
+            } else {
+                throw new Exception ("Error calling OpenAI API: " + response.StatusCode);
             }
         }
     }
 
     //写一个异步接口来调用上面的方法
     [HttpGet]
-    public async Task<string> Get(string str)
-    {
+    public async Task<string> Get (string str) {
         string model = "davinci";
         string apiKey = "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";
         string apiUrl = "https://api.openai.com/v1/engines/" + model + "/completions";
 
-        var request = new
-        {
+        var request = new {
             prompt = str,
             temperature = 0.1,
             max_tokens = 150,
@@ -101,60 +89,55 @@ public class OpenAIController : ControllerBase
             presence_penalty = 0
         };
 
-        var options = new JsonSerializerOptions
-        {
+        var options = new JsonSerializerOptions {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         };
 
-        var jsonRequest = System.Text.Json.JsonSerializer.Serialize(request, options);
-        var client = new HttpClient();
-        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", apiKey);
-        var response = await client.PostAsync(apiUrl, new StringContent(jsonRequest, Encoding.UTF8, "application/json"));
-        var jsonResponse = await response.Content.ReadAsStringAsync();
-        var output = System.Text.Json.JsonSerializer.Deserialize<OpenAIResponse>(jsonResponse, options);
+        var jsonRequest = System.Text.Json.JsonSerializer.Serialize (request, options);
+        var client = new HttpClient ();
+        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue ("Bearer", apiKey);
+        var response = await client.PostAsync (apiUrl, new StringContent (jsonRequest, Encoding.UTF8, "application/json"));
+        var jsonResponse = await response.Content.ReadAsStringAsync ();
+        var output = System.Text.Json.JsonSerializer.Deserialize<OpenAIResponse> (jsonResponse, options);
 
         return output.Choices[0].Text;
     }
 
-
-
-
     //写一个异步方法
     [HttpGet]
-    public async Task<string> Call(string str)
-    {
-        try
-        {
-            var openAiService = new OpenAIService(new OpenAiOptions()
-            {
-               // ApiKey = "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"
+    public async Task<string> Call (string str) {
+        string expectedReferer = "https://ai.myi.cn";
+
+        // 检查请求的 Referer 字段
+        string referer = Request.Headers["Referer"].ToString ();
+
+        if (referer != expectedReferer) {
+
+            return "Access denied";
+        }
+        try {
+            var openAiService = new OpenAIService (new OpenAiOptions () {
+                // ApiKey = "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"
                 ApiKey = "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"
             });
-            var completionResult = await openAiService.ChatCompletion.CreateCompletion(new ChatCompletionCreateRequest
-            {
-                Messages = new List<ChatMessage>
-    {
-        ChatMessage.FromSystem($"{str}"),
+            var completionResult = await openAiService.ChatCompletion.CreateCompletion (new ChatCompletionCreateRequest {
+                Messages = new List<ChatMessage> {
+                        ChatMessage.FromSystem ($"{str}"),
 
-    },
-                Model = Models.ChatGpt3_5Turbo,
-                MaxTokens = 2048//optional
+                    },
+                    Model = Models.ChatGpt3_5Turbo,
+                    MaxTokens = 2048 //optional
             });
-            if (completionResult.Successful)
-            {
-                return completionResult.Choices.First().Message.Content;
+            if (completionResult.Successful) {
+                return completionResult.Choices.First ().Message.Content;
             }
-            return "失败"+completionResult.Error.Message;
-        }
-        catch (System.Exception ex)
-        {
+            return "失败" + completionResult.Error.Message;
+        } catch (System.Exception ex) {
             // TODO
 
-            return "错误："+ex.Message;
+            return "错误：" + ex.Message;
         }
 
     }
-
-
 
 }
