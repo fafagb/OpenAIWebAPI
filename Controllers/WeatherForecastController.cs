@@ -106,15 +106,15 @@ public class OpenAIController : ControllerBase {
     //写一个异步方法
     [HttpGet]
     public async Task<string> Call (string str) {
-        // string expectedReferer = "https://ai.myi.cn";
+        string expectedReferer = "ai.myi.cn";
 
-        // // 检查请求的 Referer 字段
-        // string referer = Request.Headers["Origin"].ToString ();
+        // 检查请求的 Referer 字段
+        string referer = Request.Headers["Host"].ToString ();
 
-        // if (referer != expectedReferer) {
+        if (referer != expectedReferer) {
 
-        //     return $"Access denied:{referer}";
-        // }
+            return $"Access denied:{referer}";
+        }
         try {
             var openAiService = new OpenAIService (new OpenAiOptions () {
                 // ApiKey = "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"
