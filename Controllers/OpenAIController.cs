@@ -150,7 +150,7 @@ public class OpenAIController : ControllerBase {
         }
         return "返回错误";
     }
-
+   [HttpGet]
     public async Task<string> Test (string str) {
         string apiKey = "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";
         string url = "https://api.openai.com/v1/chat/completions";
