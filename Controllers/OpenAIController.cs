@@ -23,23 +23,12 @@ class OpenAIChoice {
 [ApiController]
 [Route ("[controller]/[action]")]
 public class OpenAIController : ControllerBase {
-    private static readonly string[] Summaries = new [] {
-        "Freezing",
-        "Bracing",
-        "Chilly",
-        "Cool",
-        "Mild",
-        "Warm",
-        "Balmy",
-        "Hot",
-        "Sweltering",
-        "Scorching"
-    };
-
     private readonly ILogger<OpenAIController> _logger;
+    private readonly HttpClient _httpClient;
 
-    public OpenAIController (ILogger<OpenAIController> logger) {
+    public OpenAIController (ILogger<OpenAIController> logger, HttpClient httpClient) {
         _logger = logger;
+        _httpClient = httpClient;
     }
 
     [HttpGet]
@@ -139,5 +128,58 @@ public class OpenAIController : ControllerBase {
         }
 
     }
+
+    [HttpGet]
+    public async Task<string> Question (string str) {
+        var openAiService = new OpenAIService (new OpenAiOptions () {
+            // ApiKey = "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"
+            ApiKey = "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"
+        });
+        var completionResult = await openAiService.ChatCompletion.CreateCompletion (new ChatCompletionCreateRequest {
+            Messages = new List<ChatMessage> {
+              
+                    ChatMessage.FromUser ($"{str}"),
+                 
+                },
+                Model = Models.ChatGpt3_5Turbo,
+                MaxTokens = 2048 //optional
+        });
+        if (completionResult.Successful) {
+            return completionResult.Choices.First ().Message.Content;
+            //  Console.WriteLine (completionResult.Choices.First ().Message.Content);
+        }
+        return "返回错误";
+    }
+
+    public async Task<string> Test (string str) {
+        string apiKey = "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";
+        string url = "https://api.openai.com/v1/chat/completions";
+
+        _httpClient.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue ("Bearer", apiKey);
+_httpClient.DefaultRequestHeaders.Add("OpenAI-Organization","org-6rXJXBf9tP8J0QdOA0WBUfeI");
+       string json="""
+       {
+     "model": "gpt-3.5-turbo",
+     "messages": [{"role": "user", "content": "德国使用强人工智能的农业机器人有哪些"}],
+     "temperature": 0.7
+   }
+   """;
+
+         var content = new StringContent (json, Encoding.UTF8, "application/json");
+         content.Headers.ContentType = new MediaTypeHeaderValue ("application/json");
+        var response = await _httpClient.PostAsync (url, content);
+if (response.IsSuccessStatusCode) {
+                var jsonResponse = await response.Content.ReadAsStringAsync ();
+                dynamic resultObject = JsonConvert.DeserializeObject (jsonResponse);
+                string result = resultObject.choices[0].message.content;
+                return result;
+            }else{
+return"错误";
+
+            }
+    }
+
+    /// <inheritdoc />
 
 }
