@@ -115,7 +115,9 @@ public class OpenAIController : ControllerBase {
 
                     },
                     Model = Models.ChatGpt3_5Turbo,
-                    MaxTokens = 2048 //optional
+                    MaxTokens = 256, //optional,
+                    Temperature=1,TopP=1
+                  
             });
             if (completionResult.Successful) {
                 return completionResult.Choices.First ().Message.Content;
