@@ -107,7 +107,7 @@ public class OpenAIController : ControllerBase {
         try {
             var openAiService = new OpenAIService (new OpenAiOptions () {
                 // ApiKey = "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"
-                ApiKey = "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"
+                ApiKey = "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"
             });
             var completionResult = await openAiService.ChatCompletion.CreateCompletion (new ChatCompletionCreateRequest {
                 Messages = new List<ChatMessage> {
