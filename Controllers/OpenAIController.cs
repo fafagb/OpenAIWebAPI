@@ -115,9 +115,9 @@ public class OpenAIController : ControllerBase {
 
                     },
                     Model = Models.ChatGpt3_5Turbo,
-                    MaxTokens = 256, //optional,
-                    Temperature=1,TopP=1
-                  
+                    MaxTokens = 2048, //optional,
+                    Temperature = 1, TopP = 1
+
             });
             if (completionResult.Successful) {
                 return completionResult.Choices.First ().Message.Content;
@@ -135,51 +135,65 @@ public class OpenAIController : ControllerBase {
     public async Task<string> Question (string str) {
         var openAiService = new OpenAIService (new OpenAiOptions () {
             // ApiKey = "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"
-            ApiKey = "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"
+            ApiKey = "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"
         });
-        var completionResult = await openAiService.ChatCompletion.CreateCompletion (new ChatCompletionCreateRequest {
-            Messages = new List<ChatMessage> {
-              
-                    ChatMessage.FromUser ($"{str}"),
-                 
-                },
-                Model = Models.ChatGpt3_5Turbo,
-                MaxTokens = 2048 //optional
-        });
-        if (completionResult.Successful) {
-            return completionResult.Choices.First ().Message.Content;
-            //  Console.WriteLine (completionResult.Choices.First ().Message.Content);
+        var completionResult = openAiService.Completions.CreateCompletionAsStream (new CompletionCreateRequest () {
+            Prompt = "写一份详细的语宙gpt的功能说明",
+                MaxTokens = 2048
+        }, Models.ChatGpt3_5Turbo);
+
+        await
+        foreach (var completion in completionResult) {
+            if (completion.Successful) {
+                Console.Write (completion.Choices.FirstOrDefault ()?.Text);
+            } else {
+                if (completion.Error == null) {
+                    throw new Exception ("Unknown Error");
+                }
+
+                Console.WriteLine ($"{completion.Error.Code}: {completion.Error.Message}");
+            }
         }
-        return "返回错误";
+        Console.WriteLine ("Complete");
+        return "Complete";
     }
-   [HttpGet]
+
+    [HttpGet]
     public async Task<string> Test (string str) {
         string apiKey = "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";
         string url = "https://api.openai.com/v1/chat/completions";
 
         _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue ("Bearer", apiKey);
-_httpClient.DefaultRequestHeaders.Add("OpenAI-Organization","org-6rXJXBf9tP8J0QdOA0WBUfeI");
-       string json="""
-       {
-     "model": "gpt-3.5-turbo",
-     "messages": [{"role": "user", "content": "德国使用强人工智能的农业机器人有哪些"}],
-     "temperature": 0.7
-   }
-   """;
+        _httpClient.DefaultRequestHeaders.Add ("OpenAI-Organization", "org-6rXJXBf9tP8J0QdOA0WBUfeI");
+        string json = "";
+        //         """
+        //             {"model ": "
+        //                gpt - 3.5 - turbo ",
+        //                "
+        //         messages ": [{"
+        //         role ": "
+        //         user ", "
+        //         content ": "
+        //         德国使用强人工智能的农业机器人有哪些 "}],
+        //      "
+        //         temperature ": 0.7
+        //    }
+        //    "
+        //         """;
 
-         var content = new StringContent (json, Encoding.UTF8, "application/json");
-         content.Headers.ContentType = new MediaTypeHeaderValue ("application/json");
+        var content = new StringContent (json, Encoding.UTF8, "application/json");
+        content.Headers.ContentType = new MediaTypeHeaderValue ("application/json");
         var response = await _httpClient.PostAsync (url, content);
-if (response.IsSuccessStatusCode) {
-                var jsonResponse = await response.Content.ReadAsStringAsync ();
-                dynamic resultObject = JsonConvert.DeserializeObject (jsonResponse);
-                string result = resultObject.choices[0].message.content;
-                return result;
-            }else{
-return"错误";
+        if (response.IsSuccessStatusCode) {
+            var jsonResponse = await response.Content.ReadAsStringAsync ();
+            dynamic resultObject = JsonConvert.DeserializeObject (jsonResponse);
+            string result = resultObject.choices[0].message.content;
+            return result;
+        } else {
+            return "错误";
 
-            }
+        }
     }
 
     /// <inheritdoc />
