@@ -133,9 +133,12 @@ public class OpenAIController : ControllerBase {
 
     [HttpGet]
     public async Task<string> Question (string str) {
+        
         var openAiService = new OpenAIService (new OpenAiOptions () {
             // ApiKey = "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"
             ApiKey = "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"
+            // ApiVersion="v1/chat/completions"
+            
         });
         var completionResult = openAiService.Completions.CreateCompletionAsStream (new CompletionCreateRequest () {
             Prompt = "写一份详细的语宙gpt的功能说明",
